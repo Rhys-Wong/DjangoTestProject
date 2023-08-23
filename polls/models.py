@@ -17,3 +17,15 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
     def __str__(self):
         return self.choicetext
+
+class Config(models.Model):
+    configname = models.CharField(max_length=100)
+    test1 = models.BooleanField(default=0)
+    test2 = models.BooleanField(default=0)
+    test3 = models.BooleanField(default=0)
+    test4 = models.BooleanField(default=0)
+    test5 = models.BooleanField(default=0)
+    test6 = models.BooleanField(default=0)
+    test7 = models.BooleanField(default=0)
+    def __str__(self):
+        return self.configname
