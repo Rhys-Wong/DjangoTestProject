@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .models import Question, Choice,Config
+from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
+from .models import Question, Choice
 from django.template import loader
 from django.shortcuts import render,get_object_or_404
-from django.urls import reverse
-from django.views import generic
+import csv
+from .models import Item
 
 # Create your views here.
 def index(request):
@@ -79,6 +79,27 @@ def results(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, "polls/results.html", {"question": question})
 
-def config(request, question_id):
-    config = get_object_or_404(Config, pk=question_id)
-    return render(request, "polls/config.html", {""})
+
+def export_data(request):
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('selected_items[]')
+        selected_items = Item.objects.filter(pk__in=selected_ids)
+
+        export_format = request.POST.get('export_format', 'json')
+
+        if export_format == 'json':
+            data = [{'name': item.name} for item in selected_items]
+            response = JsonResponse(data, safe=False)
+            response['Content-Disposition'] = 'attachment; filename="selected_items.json"'
+            return response
+        elif export_format == 'csv':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="selected_items.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Name'])
+            for item in selected_items:
+                writer.writerow([item.name])
+            return response
+
+    items = Item.objects.all()
+    return render(request, 'polls/export.html', {'items': items})

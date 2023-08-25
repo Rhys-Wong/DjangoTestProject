@@ -18,14 +18,9 @@ class Choice(models.Model):
     def __str__(self):
         return self.choicetext
 
-class Config(models.Model):
-    configname = models.CharField(max_length=100)
-    test1 = models.BooleanField(default=0)
-    test2 = models.BooleanField(default=0)
-    test3 = models.BooleanField(default=0)
-    test4 = models.BooleanField(default=0)
-    test5 = models.BooleanField(default=0)
-    test6 = models.BooleanField(default=0)
-    test7 = models.BooleanField(default=0)
+class Item(models.Model):
+    name = models.CharField(max_length=100)
+    selected = models.BooleanField(default=False)
+
     def __str__(self):
-        return self.configname
+        return self.name
