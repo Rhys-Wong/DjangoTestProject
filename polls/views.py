@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
-from .models import Question, Choice
+
+from .Forms import TestForm
+from .models import Question, Choice, MyModel
 from django.template import loader
 from django.shortcuts import render,get_object_or_404
 import csv
-from .models import Item
+
 
 # Create your views here.
 def index(request):
@@ -80,26 +82,13 @@ def results(request, question_id):
     return render(request, "polls/results.html", {"question": question})
 
 
-def export_data(request):
-    if request.method == 'POST':
-        selected_ids = request.POST.getlist('selected_items[]')
-        selected_items = Item.objects.filter(pk__in=selected_ids)
-
-        export_format = request.POST.get('export_format', 'json')
-
-        if export_format == 'json':
-            data = [{'name': item.name} for item in selected_items]
-            response = JsonResponse(data, safe=False)
-            response['Content-Disposition'] = 'attachment; filename="selected_items.json"'
-            return response
-        elif export_format == 'csv':
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="selected_items.csv"'
-            writer = csv.writer(response)
-            writer.writerow(['Name'])
-            for item in selected_items:
-                writer.writerow([item.name])
-            return response
-
-    items = Item.objects.all()
-    return render(request, 'polls/export.html', {'items': items})
+def form(request):
+    if request.method == "POST":
+        print(request.POST)
+        form = TestForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("")
+    else:
+        form = TestForm()
+    return render(request, "polls/name.html/", {"form" : form})
